@@ -1,0 +1,11 @@
+security:
+  anonymous:
+    - realmName: NexusAuthorizingRealm
+      enabled: true
+
+scripts:
+  - name: docker_old
+    type: groovy
+    content: "@scripts/clean_policy.groovy"
+    autostart: true
+
