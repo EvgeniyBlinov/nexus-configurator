@@ -4,8 +4,14 @@ security:
       enabled: true
 
 scripts:
+
   - name: docker_old
     type: groovy
     content: "@scripts/clean_policy.groovy"
     autostart: true
 
+  ## for debug tasks
+  #- name: system_task_debug
+    #type: groovy
+    #content: "@scripts/task_debug.groovy"
+    #autostart: true
