@@ -129,13 +129,14 @@ class Script(object):
         auth=(self.nexus.username, self.nexus.password),
       verify=not self.nexus.insecure)
 
-    try:
-      respData = r.json()
-      if 'result' in respData:
-        #self.logger.log(logging.DEBUG, respData['result'])
-        self.logger.log(logging.DEBUG, respData)
-    except e:
-      self.logging.log(logging.DEBUG, e)
+    if r.status_code == 200:
+      try:
+        respData = r.json()
+        if 'result' in respData:
+          #self.logger.log(logging.DEBUG, respData['result'])
+          self.logger.log(logging.DEBUG, respData)
+      except Exception as e:
+        self.logging.log(logging.DEBUG, e)
 
     return (r.status_code == 204)
 
