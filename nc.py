@@ -24,6 +24,7 @@ class ScriptItem(object):
 
     self.get_autostart()
     self.get_args()
+    self.run = self.get_run()
 
 
   def get_args(self):
@@ -40,6 +41,14 @@ class ScriptItem(object):
       self.autostart = bool(self._script['autostart'])
 
     return self.autostart
+
+
+  def get_run(self):
+    run = []
+    if 'run' in self._script:
+      run = self._script['run']
+
+    return run
 
 
   def get_content(self):
@@ -110,17 +119,23 @@ class Script(object):
     return (r.status_code == 204)
 
 
-  def run(self):
-    self.logger.log(logging.DEBUG, "Run script '%s'" % self.script.name)
+  def run(self, args={}):
+    self.logger.log(logging.DEBUG, "Run script '%s' with args '%s'" %
+        (self.script.name, args))
     url = '/'.join([self.get_url(), self.script.name, 'run'])
     r = requests.post(
         url,
-        json = self.script.args,
+        json = args,
         auth=(self.nexus.username, self.nexus.password),
       verify=not self.nexus.insecure)
-    #respData = r.json()
-    #if 'result' in respData:
-      #print(respData['result'])
+
+    try:
+      respData = r.json()
+      if 'result' in respData:
+        #self.logger.log(logging.DEBUG, respData['result'])
+        self.logger.log(logging.DEBUG, respData)
+    except e:
+      self.logging.log(logging.DEBUG, e)
 
     return (r.status_code == 204)
 
@@ -133,7 +148,11 @@ class Script(object):
       self.create()
 
     if self.script.autostart:
-      self.run()
+      self.run(self.script.args)
+
+    for run_params in self.script.run:
+      self.run(run_params)
+
 
 
   def delete(self):
